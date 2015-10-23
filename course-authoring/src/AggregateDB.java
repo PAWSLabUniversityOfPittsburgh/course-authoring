@@ -372,6 +372,7 @@ public class AggregateDB extends dbInterface{
 			query = "update ent_resource set resource_name='"+genid+"' where resource_id = '"+resid+"';";					
 			stmt.executeUpdate(query);				
 			this.releaseStatement(stmt,rs);
+			log("AddResource", usr, resid.toString());
 			return resid;
 		}catch (SQLException ex) {
 			this.releaseStatement(stmt,rs);
@@ -411,6 +412,7 @@ public class AggregateDB extends dbInterface{
 			String query = "update ent_resource set resource_name = '"+name+"', display_name='"+name+"' where resource_id = '"+resid+"';";
 			stmt.executeUpdate(query);				
 			this.releaseStatement(stmt,rs);
+			log("EditResource", "", resid);
 			return true;
 		}catch (SQLException ex) {
 			this.releaseStatement(stmt,rs);
@@ -440,6 +442,7 @@ public class AggregateDB extends dbInterface{
 			query = "delete from ent_resource where resource_id = '"+resid+"';";
 			stmt.executeUpdate(query);
 			this.releaseStatement(stmt,rs);
+			log("DelResource", "", resid);
 			return true;
 		}catch (SQLException ex) {
 			this.releaseStatement(stmt,rs);
@@ -502,6 +505,7 @@ public class AggregateDB extends dbInterface{
 			String query = "insert into rel_resource_provider (resource_id,provider_id) value ('"+resid+"','"+provid+"');";					
 			stmt.executeUpdate(query);				
 			this.releaseStatement(stmt,rs);
+			log("AddProvider", "", resid+", "+provid);
 			return true;
 		}catch (SQLException ex) {
 			this.releaseStatement(stmt,rs);
@@ -520,6 +524,7 @@ public class AggregateDB extends dbInterface{
 			String query = "delete from rel_resource_provider where resource_id='"+resid+"' and provider_id='"+provid+"';";					
 			stmt.executeUpdate(query);				
 			this.releaseStatement(stmt,rs);
+			log("DelProvider", "", resid+", "+provid);
 			return true;
 		}catch (SQLException ex) {
 			this.releaseStatement(stmt,rs);
@@ -546,6 +551,7 @@ public class AggregateDB extends dbInterface{
 	            uid=rs.getInt(1);
 	        }
 			this.releaseStatement(stmt,rs);
+			log("AddUnit", usr, uid.toString());
 			return uid;
 		}catch (SQLException ex) {
 			this.releaseStatement(stmt,rs);
@@ -585,6 +591,7 @@ public class AggregateDB extends dbInterface{
 			String query = "update ent_topic set topic_name = '"+name+"', display_name='"+name+"' where topic_id = '"+uid+"';";
 			stmt.executeUpdate(query);				
 			this.releaseStatement(stmt,rs);
+			log("EditUnit", "", uid);
 			return true;
 		}catch (SQLException ex) {
 			this.releaseStatement(stmt,rs);
@@ -607,6 +614,7 @@ public class AggregateDB extends dbInterface{
 			query = "delete from ent_topic where topic_id = '"+uid+"';";
 			stmt.executeUpdate(query);
 			this.releaseStatement(stmt,rs);
+			log("DelUnit", "", uid);
 			return true;
 		}catch (SQLException ex) {
 			this.releaseStatement(stmt,rs);
@@ -680,6 +688,7 @@ public class AggregateDB extends dbInterface{
 					+ " value ('"+uid+"','"+resid+"','"+actid+"','"+displayName+"', '"+neworder+"', '"+dateFormat.format(date)+"','"+usr+"','1');";
 			stmt.executeUpdate(query);				
 			this.releaseStatement(stmt,rs);
+			log("AddAct", usr, uid+", "+resid+", "+actid);
 			return true;
 		}catch (SQLException ex) {
 			this.releaseStatement(stmt,rs);
@@ -721,6 +730,7 @@ public class AggregateDB extends dbInterface{
 			String query = "delete from rel_topic_content where topic_id = '"+uid+"' and resource_id = '"+resid+"' and content_id='"+actid+"';";
 			stmt.executeUpdate(query);			
 			this.releaseStatement(stmt,rs);
+			log("DeleteAct", "", uid+", "+resid+", "+actid);
 			return true;
 		}catch (SQLException ex) {
 			this.releaseStatement(stmt,rs);
@@ -864,6 +874,7 @@ public class AggregateDB extends dbInterface{
 			}
 				    
 			this.releaseStatement(stmt,rs);
+			log("CloneCourse", usr, newcid.toString());
 			return newcid;
 		}catch (SQLException ex) {
 			this.releaseStatement(stmt,rs);
@@ -951,6 +962,7 @@ public class AggregateDB extends dbInterface{
 			query = "delete from ent_course where course_id ='"+cid+"';";
 			stmt.executeUpdate(query);			
 			this.releaseStatement(stmt,rs);
+			log("DeleteCourse", "", cid);
 			return true;
 		}catch (SQLException ex) {
 			this.releaseStatement(stmt,rs);
@@ -1020,6 +1032,7 @@ public class AggregateDB extends dbInterface{
 	            newcid=rs.getInt(1);
 	        }
 			this.releaseStatement(stmt,rs);
+			log("AddCourse", usr, newcid.toString());
 			return newcid;
 		}catch (SQLException ex) {
 			this.releaseStatement(stmt,rs);
@@ -1043,6 +1056,7 @@ public class AggregateDB extends dbInterface{
 					        " where course_id = '"+cid+"';";
 			stmt.executeUpdate(query);				
 			this.releaseStatement(stmt,rs);
+			log("EditCourse", usr, Integer.toString(cid));
 			return true;
 		}catch (SQLException ex) {
 			this.releaseStatement(stmt,rs);
@@ -1051,6 +1065,24 @@ public class AggregateDB extends dbInterface{
 			System.out.println("SQLState: " + ex.getSQLState()); 
 			System.out.println("VendorError: " + ex.getErrorCode());
 			return false;
+		}finally{
+			this.releaseStatement(stmt,rs);
+		}	
+	}
+
+	private void log(String action, String subject, String object){
+		try{
+			stmt = conn.createStatement();
+			Long unixTime = System.currentTimeMillis()/1000L;
+			String query = "INSERT INTO `aggregate`.`ent_log` (`action`, `time`, `subject`, `object`)" +
+					"VALUES('" + action+ "', '" + unixTime.toString() + "', '" + subject + "', '" + object + "');";
+			stmt.executeUpdate(query,Statement.RETURN_GENERATED_KEYS);				
+			this.releaseStatement(stmt,rs);	
+		}catch (SQLException ex) {
+			this.releaseStatement(stmt,rs);
+			System.out.println("SQLException: " + ex.getMessage()); 
+			System.out.println("SQLState: " + ex.getSQLState()); 
+			System.out.println("VendorError: " + ex.getErrorCode());
 		}finally{
 			this.releaseStatement(stmt,rs);
 		}	
