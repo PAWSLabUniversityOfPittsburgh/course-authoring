@@ -12,8 +12,12 @@
  */
 
 //Course authoring initialize
-var CA = CA || {},
-	centralUrl = "localhost/toolsuc/";
+var CA = CA || {}, 	centralUrl;
+if(document.domain === 'localhost'){
+	centralUrl = "http://localhost:8080/toolsuc/";
+}else{
+	centralUrl = "http://"+document.domain+"/toolsuc/";
+}
 
 
 CA.Parent = function() {};
@@ -507,6 +511,8 @@ CA.request = function(actionURL, args){
 			rs = eval('(' + data + ')');
 			CA.receive(actionURL, rs);
 		}, "text");
+		//show the loading sign
+		$('#loadMask').show();
 	}else{
 		CA.view.infoMsg('You do not have the right to do so, because this is not your course.');
 		return false;
@@ -516,12 +522,13 @@ CA.request = function(actionURL, args){
 //universal receiver
 CA.nameSpace('receive');
 CA.receive = function(actionName, rs){
+	//hide the loading sign
+	$('#loadMask').hide();
 	//use error handler to feedback
 	if(typeof(rs) === 'undefined')
 		this.ajaxError('Unable to connect to the server.');
+	//validate the result
 	CA.outcomeValidation(actionName, rs);
-	//call relevant handler to further process the result
-//	this[actionName + 'Handler'](rs);
 };
 
 //outcome validation
@@ -1085,6 +1092,32 @@ CA.view = {
 		drawer : {},
 		
 		init : function(){
+			//make the loading sign on
+			var opts = {
+					  lines: 11 // The number of lines to draw
+					, length: 12 // The length of each line
+					, width: 16 // The line thickness
+					, radius: 36 // The radius of the inner circle
+					, scale: 0.25 // Scales overall size of the spinner
+					, corners: 1 // Corner roundness (0..1)
+					, color: '#000' // #rgb or #rrggbb or array of colors
+					, opacity: 0.25 // Opacity of the lines
+					, rotate: 0 // The rotation offset
+					, direction: 1 // 1: clockwise, -1: counterclockwise
+					, speed: 0.7 // Rounds per second
+					, trail: 60 // Afterglow percentage
+					, fps: 20 // Frames per second when using setTimeout() as a fallback for CSS
+					, zIndex: 2e9 // The z-index (defaults to 2000000000)
+					, className: 'spinner' // The CSS class to assign to the spinner
+					, top: '50%' // Top position relative to parent
+					, left: '50%' // Left position relative to parent
+					, shadow: false // Whether to render a shadow
+					, hwaccel: false // Whether to use hardware acceleration
+					, position: 'absolute' // Element positioning
+					};
+			var target = document.getElementById('loadMask');
+			var spinner = new Spinner(opts).spin(target);
+			
 			//put user info into the div
 			$('#userInfo').html("Welcome " + this.p.usr + "! Click <a href=\""+ centralUrl +"\">here</a> to go back to the portal.");
 			this.drawer = $('#ca').accordion({
@@ -1567,7 +1600,8 @@ CA.view = {
 		},
 
 		preview : function(url){
-			var container = $('.preview');
+			var container = $('.preview'),
+				url = url + "&usr=" + CA.actions.pointer.usr + "&grp=" + CA.actions.pointer.grp + "&sid=preview";
 			container.html('<object id="preview_window" type="text/html" data="' + url + '"></object>');
 			container.dialog('open');
 		},
