@@ -279,17 +279,19 @@ CA.actions = {
 				if ((query.auid != 'aaa') && (localStorage.getItem("latestAuthor"))){
 					console.log('Retrieved Value: '+query.auid);
 					console.log('1');
+					//localStorage.removeItem('latestAuthor');
 					qquery.auid = $('#tabs' + rId + ' .pool .author .aAuthor option:selected').prop('value');
 					$('#tabs' + rId + ' .pool .author .aAuthor').val(query.auid);
 					if ((qquery.auid != query.auid) && (qquery.auid != 'aaa')){
 						query.auid = qquery.auid;
 						console.log('2');
+						//localStorage.removeItem('latestAuthor');
 						$('#tabs' + rId + ' .pool .author .aAuthor').val(query.auid);
 						localStorage.setItem("latestAuthor", query.auid);
 					}
 				}
 				else if (!localStorage.getItem("latestAuthor")){
-					query.auid = $('#tabs' + rId + ' .pool .author .aAuthor').val(localStorage.getItem("latestAuthor")).prop('value');
+					query.auid = $('#tabs' + rId + ' .pool .author .aAuthor').prop('value');
 					console.log('Value: '+query.auid);
 					console.log('3');
 					localStorage.setItem("latestAuthor", query.auid);
@@ -299,6 +301,7 @@ CA.actions = {
 					query.auid = $('#tabs' + rId + ' .pool .author .aAuthor option:selected').prop('value');
 					localStorage.setItem("latestAuthor", query.auid);
 					console.log('4');
+					localStorage.setItem("latestAuthor", query.auid);
 					console.log('Now Stored Author: '+query.auid);
 				}
 				
