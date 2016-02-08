@@ -276,13 +276,13 @@ CA.actions = {
 				 */
 				query.auid = localStorage.getItem("latestAuthor");
 				
-				if ((query.auid != 'aaa') && (localStorage.getItem("latestAuthor"))){
+				if ((query.auid != 'adl01') && (localStorage.getItem("latestAuthor"))){
 					console.log('Retrieved Value: '+query.auid);
 					console.log('1');
 					//localStorage.removeItem('latestAuthor');
 					qquery.auid = $('#tabs' + rId + ' .pool .author .aAuthor option:selected').prop('value');
 					$('#tabs' + rId + ' .pool .author .aAuthor').val(query.auid);
-					if ((qquery.auid != query.auid) && (qquery.auid != 'aaa')){
+					if ((qquery.auid != query.auid) && (qquery.auid != 'adl01')){
 						query.auid = qquery.auid;
 						console.log('2');
 						//localStorage.removeItem('latestAuthor');
