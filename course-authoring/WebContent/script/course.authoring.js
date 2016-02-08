@@ -19,6 +19,7 @@ if(document.domain === 'localhost'){
 	centralUrl = "http://"+document.domain+"/toolsuc/";
 }
 
+var masteryLinkUrl = "http://adapt2.sis.pitt.edu/um-vis-dev/index.html?usr=demo&grp=ADL&sid=TEST&cid=";
 
 CA.Parent = function() {};
 CA.Child = function() {};
@@ -57,7 +58,7 @@ CA.wareHouse = {
 	authors : [],
 	providers : []
 };
-
+console.log(CA.wareHouse);
 /*
  * 
  * Actions
@@ -244,6 +245,7 @@ CA.actions = {
 			
 			activityQuery : function(rId){
 				var query = {};
+				var qquery = {};
 					query.providers = [];
 					resources = CA.wareHouse.courses[CA.actions.pointer.cIdx].resources;
 				
@@ -256,7 +258,51 @@ CA.actions = {
 					}
 				}
 				
-				query.auid = $('#tabs' + rId + ' .pool .author .aAuthor option:selected').attr('value');
+				/*
+				 (function() {
+					var auid = localStorage.getItem("author");
+					if (auid !== null) {
+						$('.author').val(auid);
+						console.log('hello!');
+						//console.log(rId);
+					}
+					$('.author').on("change", function() {
+						console.log('Ok!');
+						auid = $(this).val();
+						console.log(auid);
+						localStorage.setItem("author", auid);
+					});
+				})();
+				 */
+				query.auid = localStorage.getItem("latestAuthor");
+				
+				if ((query.auid != 'aaa') && (localStorage.getItem("latestAuthor"))){
+					console.log('Retrieved Value: '+query.auid);
+					console.log('1');
+					qquery.auid = $('#tabs' + rId + ' .pool .author .aAuthor option:selected').prop('value');
+					$('#tabs' + rId + ' .pool .author .aAuthor').val(query.auid);
+					if ((qquery.auid != query.auid) && (qquery.auid != 'aaa')){
+						query.auid = qquery.auid;
+						console.log('2');
+						$('#tabs' + rId + ' .pool .author .aAuthor').val(query.auid);
+						localStorage.setItem("latestAuthor", query.auid);
+					}
+				}
+				else if (!localStorage.getItem("latestAuthor")){
+					query.auid = $('#tabs' + rId + ' .pool .author .aAuthor').val(localStorage.getItem("latestAuthor")).prop('value');
+					console.log('Value: '+query.auid);
+					console.log('3');
+					localStorage.setItem("latestAuthor", query.auid);
+					console.log('Now Stored Author: '+query.auid);
+				}
+				else{
+					query.auid = $('#tabs' + rId + ' .pool .author .aAuthor option:selected').prop('value');
+					localStorage.setItem("latestAuthor", query.auid);
+					console.log('4');
+					console.log('Now Stored Author: '+query.auid);
+				}
+				
+				
 				
 				var keyword = $('#tabs' + rId + ' .pool .filter .aQuery').val();
 				query.patt1 = new RegExp('^'+keyword, 'i');
@@ -706,7 +752,7 @@ CA.handlers = {
 			}
 			console.log('\nDeletion completed. Here is the result:');
 			console.log(rs);
-			//refresh resources
+			// resources
 			CA.view.initCourse.refreshRList();
 			//close the dialog
 			$('#rDelDialog').dialog('close');
@@ -966,6 +1012,7 @@ CA.format = {
 						cInfo.institution,
 						date.getFullYear() + '-' + date.getMonth(), 
 						cInfo.groupCount,
+						cInfo.id,
 						i];
 				if(cInfo.isMy == false && cInfo.visible == "0"){
 					break;
@@ -1013,7 +1060,7 @@ CA.format = {
 							'<div class="funcWrapper" id="aFunction"><ul class="functions ui-widget ui-helper-clearfix"><li class="ui-state-default ui-corner-all" title="Delete this activity"><span class="delAct ui-icon ui-icon-trash"></span></li></ul>' + 
 							'</div></div>' +
 							'<div class="pool">' +
-							'<div class="author"><label>Author:</label><select class="aAuthor"></select></div>' +
+							'<div class="author"><label style="color:black">Author: ' + '</label>' + '<select class="aAuthor"></select></div>' +
 							'<div class="filter"><label>Keywords:</label><input class="aQuery"></input></div>' +
 							'<div class="pList"><label>Available Activities:</label>' +
 							'<div class="plate pplate"><ol class="pool"></ol></div></div>' +
@@ -1132,9 +1179,9 @@ CA.view = {
 			//make each panel in different color
 			var title = this.drawer.find('h3');
 			title.hover(function(){$(this).removeClass('ui-state-hover');});
-			title.eq(0).css({'background': '#EAFF68', 'color': '#707F15'});
-			title.eq(1).css({'background': '#68FF9E', 'color': '#157F3B'});
-			title.eq(2).css({'background': '#CEF7FF', 'color': '#1E6F7F'});
+			title.eq(0).css({'background': '#80b3ff', 'color': '#000000','border-color':'#004c99'});
+			title.eq(1).css({'background': '#80b3ff', 'color': '#000000','border-color':'#004c99'});
+			title.eq(2).css({'background': '#80b3ff', 'color': '#000000','border-color':'#004c99'});
 			return this.initCList();
 		},
 		
@@ -1146,8 +1193,9 @@ CA.view = {
 			tbody.on('click', 'tr', function(){
 				$(this).addClass('selected').siblings().removeClass('selected');
 				var rData = CA.courseTable.row(this).data(),
-					cIdx = rData[8],
+					cIdx = rData[9],
 					cId = CA.wareHouse.courses[cIdx].id;
+				$('#mastery-link').attr("href",masteryLinkUrl+cId);
 				//update the pointer
 				CA.actions.pointer.cIdx = cIdx;
 				CA.actions.pointer.cid = cId;
@@ -1628,7 +1676,7 @@ CA.deploy = {
 				"bInfo" : false,
 				
 				"columns": [
-				            { "title": " ", "class": "center", "width" : "20px"},//mine
+				            { "title": "Own", "class": "center", "width" : "20px"},//mine
 				            { "title": "Domain", "class": "center" },				            
 				            { "title": "Course Code" },
 				            { "title": "Course Name" },
@@ -1636,7 +1684,7 @@ CA.deploy = {
 				            { "title": "Institution", "class": "center", "width" : "30px"},				            
 				            { "title": "Created on" },
 				            { "title": "# of Groups", "class": "center", "width" : "30px"},
-				            { "title": "CourseIdx", "visible": false},],
+				            { "title": "Course Id", "visible": true, "width" : "30px"},],
 			});
 		},
 		

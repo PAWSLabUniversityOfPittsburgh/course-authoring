@@ -13,8 +13,31 @@
 	<link href="public/jquery-ui.css" rel="stylesheet">
 	<!-- css ends -->
     
+    
+    <style>
+	.no-js #loader { display: none;  }
+	.js #loader { display: block; position: absolute; left: 100px; top: 0; }
+	.se-pre-con {
+	position: relative;
+	
+	height: 100%;
+	margin:0 auto;
+	background: url("http://smallenvelop.com/wp-content/uploads/2014/08/Preloader_8.gif") center no-repeat #fff;}
+	</style>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.2/modernizr.js"></script>
+
+	<script>
+	$(window).load(function() {
+	    // Animate loader off screen
+	    $(".se-pre-con").fadeOut("slow");;
+	});
+	</script>
+    
+    
+    
     <!-- JavaScript -->
-	<script src="script/jquery-1.11.2.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
+	<!--  <script src="script/jquery-1.11.2.min.js"></script> -->
 	<script src="script/jquery.dataTables.min.js"></script>
 	<script src="script/jquery-ui.min.js"></script>
     <script src="script/jquery.cookie.js"></script>
@@ -29,6 +52,7 @@
 <body>
 <div id="userInfo"></div>
 <div class="wrap">
+<div class="se-pre-con">
 	<div id="ca">
 		<h3><span class="cNotifyContent">Course List</span></h3>
 		<div>
@@ -51,6 +75,7 @@
 				<input type="checkbox" class="cVisible"/>This course is visible</div>
 			</div>
 			<div style="clear:both"></div>
+			<label style="padding-left:6px"><a id="mastery-link" href="" style="color:blue;text-decoration:none" target="_blank">Link to Course in Mastery Grid</a></label>	
 			<div class="submitAction"></div>
 			<div style="float:left; width: 630px">
 				<div class="title1">Resources &amp; Providers</div>
@@ -226,7 +251,9 @@
 	</div>
 </div>
 <!-- Info Sign ends -->
-	
+
+</div> <!-- This is for the Spinner -->	
+
 </body>
 
 </html>
