@@ -58,7 +58,10 @@ CA.wareHouse = {
 	authors : [],
 	providers : []
 };
-console.log(CA.wareHouse);
+//console.log(CA.wareHouse);
+console.log(CA.wareHouse.authors);
+
+//CA.wareHouse.authors.join();
 /*
  * 
  * Actions
@@ -276,13 +279,13 @@ CA.actions = {
 				 */
 				query.auid = localStorage.getItem("latestAuthor");
 				
-				if ((query.auid != 'adl01') && (localStorage.getItem("latestAuthor"))){
+				if ((query.auid != 'aaa') && (localStorage.getItem("latestAuthor"))){
 					console.log('Retrieved Value: '+query.auid);
 					console.log('1');
 					//localStorage.removeItem('latestAuthor');
 					qquery.auid = $('#tabs' + rId + ' .pool .author .aAuthor option:selected').prop('value');
 					$('#tabs' + rId + ' .pool .author .aAuthor').val(query.auid);
-					if ((qquery.auid != query.auid) && (qquery.auid != 'adl01')){
+					if ((qquery.auid != query.auid) && (qquery.auid != 'aaa')){
 						query.auid = qquery.auid;
 						console.log('2');
 						//localStorage.removeItem('latestAuthor');
@@ -605,12 +608,15 @@ CA.handlers = {
 			CA.wareHouse.domains = rs.data.domains;
 			CA.wareHouse.courses = rs.data.courses;
 			CA.wareHouse.activities = rs.data.activities;
+			
+			console.log(CA.wareHouse.authors);
 			CA.wareHouse.authors = rs.data.authors;
+			CA.wareHouse.authors.splice(0,0,{'id':'aaa','name':'Please select an author'});
+			console.log(CA.wareHouse.authors);
 			CA.wareHouse.providers = rs.data.providers;
 			//initialize the display for the first time
 			CA.view.init();
 		},
-		
 		//ActSetIdx receive handler
 		ActSetIdxHandler : function(rs){
 			var index = parseInt(rs.idx);
